@@ -28,22 +28,9 @@ async function run() {
 
 run();
 
-function sendRequest(url) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", url, true);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    resolve(JSON.parse(xhr.response));
-                } else {
-                    reject(new Error(`Request failed with status ${xhr.status}`));
-                }
-            }
-        };
-        xhr.onerror = () => reject(new Error("Network error"));
-        xhr.send();
-    });
+async function sendRequest(url) {
+    const response = await fetch(url);
+    return response.json();
 }
 
 function reqsToMap(requisites) {

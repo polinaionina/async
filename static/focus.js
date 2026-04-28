@@ -1,6 +1,6 @@
 const API = {
     organizationList: "/orgsList",
-    analytics: "/api3/analytics",
+    analytics: "/api3/analitics",
     orgReqs: "/api3/reqBase",
     buhForms: "/api3/buh",
 };
@@ -10,13 +10,14 @@ async function run() {
         const orgOgrns = await sendRequest(API.organizationList);
         const ogrns = orgOgrns.join(",");
         
-        const requisites = await sendRequest(`${API.orgReqs}?ogrn=${ogrns}`);
+        const [requisites, analytics, buh] = await Promise.all([
+            sendRequest(`${API.orgReqs}?ogrn=${ogrns}`),
+            sendRequest(`${API.analytics}?ogrn=${ogrns}`),
+            sendRequest(`${API.buhForms}?ogrn=${ogrns}`)
+        ]);
+
         const orgsMap = reqsToMap(requisites);
-        
-        const analytics = await sendRequest(`${API.analytics}?ogrn=${ogrns}`);
         addInOrgsMap(orgsMap, analytics, "analytics");
-        
-        const buh = await sendRequest(`${API.buhForms}?ogrn=${ogrns}`);
         addInOrgsMap(orgsMap, buh, "buhForms");
         
         render(orgsMap, orgOgrns);
@@ -31,7 +32,8 @@ run();
 async function sendRequest(url) {
     const response = await fetch(url);
     if (!response.ok) {
-        alert(`Ошибка запроса: ${response.status} ${response.statusText}`);
+        alert(`Ошибка: ${response.status}`);
+        throw new Error(`HTTP Error: ${response.status}`);
     }
     
     return response.json();

@@ -20,7 +20,7 @@ async function run() {
         addInOrgsMap(orgsMap, buh, "buhForms");
         
         render(orgsMap, orgOgrns);
-        
+
     } catch (error) {
         console.error("Error fetching data:", error);
     }
@@ -28,18 +28,20 @@ async function run() {
 
 run();
 
-function sendRequest(url, callback) {
+function sendRequest(url) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
-                    callback(JSON.parse(xhr.response));
+                    resolve(JSON.parse(xhr.response));
+                } else {
+                    reject(new Error(`Request failed with status ${xhr.status}`));
                 }
             }
         };
-        
+        xhr.onerror = () => reject(new Error("Network error"));
         xhr.send();
     });
 }

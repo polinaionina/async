@@ -30,6 +30,10 @@ run();
 
 async function sendRequest(url) {
     const response = await fetch(url);
+    if (!response.ok) {
+        alert(`Ошибка запроса: ${response.status} ${response.statusText}`);
+    }
+    
     return response.json();
 }
 
